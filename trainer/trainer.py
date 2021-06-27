@@ -1,6 +1,7 @@
 import time
 import numpy as np
 import torch
+from tqdm import tqdm
 
 from .trainer_base import BaseTrainer
 from utils import AverageMeter
@@ -30,7 +31,6 @@ class Trainer(BaseTrainer):
         self.valid_data_loader = valid_data_loader
         self.do_validation = self.valid_data_loader is not None
         self.lr_scheduler = lr_scheduler
-        self.log_step = int(np.sqrt(data_loader.batch_size))
 
     def _eval_metrics(self, output, target):
         acc_metrics = np.zeros(len(self.metrics))
@@ -53,55 +53,37 @@ class Trainer(BaseTrainer):
         """
         self.model.train()
 
-        batch_time = AverageMeter()
-        data_time = AverageMeter()
         losses = AverageMeter()
+        start_time = time.time()
 
         total_loss = 0
         total_metrics = np.zeros(len(self.metrics))
-        end_time = time.time()
-        for batch_idx, batch in enumerate(self.data_loader):
-            input_ids = batch["input_ids"]
-            attention_mask = batch["attention_mask"]
-            segment_ids = batch["token_type_ids"]
-            target = batch["target"]
 
-            data_time.update(time.time() - end_time)
+        with tqdm(self.data_loader, unit="batch") as pbar:
+            for batch_idx, batch in enumerate(pbar):
+                pbar.set_description("Epoch {}".format(epoch))
+                input_ids = batch["input_ids"]
+                attention_mask = batch["attention_mask"]
+                segment_ids = batch["token_type_ids"]
+                target = batch["target"]
 
-            target = target.to(self.device)
-            input_ids = input_ids.to(self.device)
-            attention_mask = attention_mask.to(self.device)
-            segment_ids = segment_ids.to(self.device)
-            output = self.model(batch=(input_ids, attention_mask, segment_ids))
-            loss = self.loss(output, target)
+                target = target.to(self.device)
+                input_ids = input_ids.to(self.device)
+                attention_mask = attention_mask.to(self.device)
+                segment_ids = segment_ids.to(self.device)
+                output = self.model(batch=(input_ids, attention_mask, segment_ids))
+                loss = self.loss(output, target)
 
-            self.optimizer.zero_grad()
-            loss.backward()
-            self.optimizer.step()
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
 
-            total_loss += loss.item()
-            total_metrics += self._eval_metrics(output, target)
+                total_loss += loss.item()
+                total_metrics += self._eval_metrics(output, target)
 
-            losses.update(loss.item(), target.size(0))
-            batch_time.update(time.time() - end_time)
-            end_time = time.time()
-            if batch_idx % self.log_step == 0:
-                self.logger.debug(
-                    "Epoch: [{0}][{1}/{2}] {percent:.0f}%\t lr: {lr:.5f}\t"
-                    "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
-                    "Data {data_time.val:.3f} ({data_time.avg:.3f})\t"
-                    "Loss {loss.val:.4f} ({loss.avg:.4f})".format(
-                        epoch,
-                        batch_idx,
-                        len(self.data_loader),
-                        percent=100.0 * batch_idx / len(self.data_loader),
-                        lr=self.optimizer.param_groups[0]["lr"],
-                        batch_time=batch_time,
-                        data_time=data_time,
-                        loss=losses,
-                    )
-                )
-
+                losses.update(loss.item(), target.size(0))
+                pbar.set_postfix(loss="{:.3f}({:.3f})".format(losses.val, losses.avg))
+        
         log = {
             "loss": total_loss / len(self.data_loader),
             "metrics": (total_metrics / len(self.data_loader)).tolist(),
@@ -114,6 +96,7 @@ class Trainer(BaseTrainer):
         if self.lr_scheduler is not None:
             self.lr_scheduler.step()
 
+        self.logger.info("Epoch {} time taken: {}".format(epoch, time.time() - start_time))
         return log
 
     def _valid_epoch(self, epoch):
@@ -127,22 +110,24 @@ class Trainer(BaseTrainer):
         total_val_loss = 0
         total_val_metrics = np.zeros(len(self.metrics))
         with torch.no_grad():
-            for batch_idx, batch in enumerate(self.valid_data_loader):
-                input_ids = batch["input_ids"]
-                attention_mask = batch["attention_mask"]
-                segment_ids = batch["token_type_ids"]
-                target = batch["target"]
+            with tqdm(self.valid_data_loader, unit="batch") as pbar:
+                for batch_idx, batch in enumerate(pbar):
+                    pbar.set_description("Epoch {} (Valid)".format(epoch))
+                    input_ids = batch["input_ids"]
+                    attention_mask = batch["attention_mask"]
+                    segment_ids = batch["token_type_ids"]
+                    target = batch["target"]
 
-                target = target.to(self.device)
-                input_ids = input_ids.to(self.device)
-                attention_mask = attention_mask.to(self.device)
-                segment_ids = segment_ids.to(self.device)
+                    target = target.to(self.device)
+                    input_ids = input_ids.to(self.device)
+                    attention_mask = attention_mask.to(self.device)
+                    segment_ids = segment_ids.to(self.device)
 
-                output = self.model(batch=(input_ids, attention_mask, segment_ids))
-                loss = self.loss(output, target)
+                    output = self.model(batch=(input_ids, attention_mask, segment_ids))
+                    loss = self.loss(output, target)
 
-                total_val_loss += loss.item()
-                total_val_metrics += self._eval_metrics(output, target)
+                    total_val_loss += loss.item()
+                    total_val_metrics += self._eval_metrics(output, target)
 
         return {
             "val_loss": total_val_loss / len(self.valid_data_loader),
