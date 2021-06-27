@@ -1,0 +1,33 @@
+# run info
+exp_name: 'experiment'
+version: '20210625'
+
+# directories
+data_dir: './data/'
+train_path: './data/train.csv'
+valid_path: './data/valid.csv'
+out_dir: './results/'
+
+# logging
+log_dir: './results/logging'
+verbosity: 2
+
+# data parameters
+max_len: 50
+
+# trainer
+trainer: {
+  epochs: 20,
+  save_dir: "saved/",
+  save_period: 1,
+  verbosity: 2,
+  monitor: "min val_loss",
+  early_stop: 10,
+  tensorboardX: true
+}
+
+# model parameters
+batch_size: 16
+learning_rate: 0.001
+
+n_gpu: 1
