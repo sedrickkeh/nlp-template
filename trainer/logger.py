@@ -6,7 +6,7 @@ from utils import read_json
 
 
 def setup_logging(
-    save_dir, log_config="trainer/logger_config.json", default_level=logging.INFO
+    log_dir, log_config="trainer/logger_config.json", default_level=logging.INFO
 ):
     """
     Setup logging configuration
@@ -17,9 +17,9 @@ def setup_logging(
         # modify logging paths based on run config
         for _, handler in config["handlers"].items():
             if "filename" in handler:
-                handler["filename"] = "{}/{}".format(save_dir, handler["filename"])
-
+                handler["filename"] = "{}/{}".format(log_dir, handler["filename"])
         logging.config.dictConfig(config)
+        
     else:
         print(
             "Warning: logging configuration file is not found in {}.".format(log_config)

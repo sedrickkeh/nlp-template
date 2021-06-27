@@ -139,13 +139,8 @@ class Trainer(BaseTrainer):
                 segment_ids = segment_ids.to(self.device)
 
                 output = self.model(batch=(input_ids, attention_mask, segment_ids))
-                print(output.shape)
-                print(output)
-                print(target.shape)
-                print(target)
                 loss = self.loss(output, target)
 
-                print(loss.item())
                 total_val_loss += loss.item()
                 total_val_metrics += self._eval_metrics(output, target)
 
