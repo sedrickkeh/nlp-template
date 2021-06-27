@@ -1,10 +1,11 @@
 import os
 import argparse
-from utils import config
+from datetime import datetime 
 
 import torch
 from transformers import AutoTokenizer, AdamW
 
+from utils import config
 from dataloaders.get_dataloaders import get_dataloaders
 from model.model import BertClassifier
 from model.loss import cross_entropy
@@ -13,8 +14,6 @@ from trainer.trainer import Trainer
 
 
 def main(config):
-    exp_name = config.exp_name
-    version = config.version
 
     # Initialize tokenizer
     tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
@@ -23,10 +22,11 @@ def main(config):
     trainloader, validloader = get_dataloaders(config, tokenizer)  
 
     # Experiment tracking and saving
-    out_dir = config.out_dir
-    out_dir = out_dir + 'exp-' + version + "/"
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
+    version = datetime.now().strftime("%Y-%m-%d-%H:%M")
+    exp_name = "exp-{}".format(version)
+    config.out_dir = config.out_dir + "{}/".format(exp_name)
+    if not os.path.exists(config.out_dir):
+        os.makedirs(config.out_dir)
 
     # Load model
     model = BertClassifier(out_dim=2)

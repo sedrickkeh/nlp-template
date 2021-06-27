@@ -1,6 +1,5 @@
 # run info
 exp_name: 'experiment'
-version: '20210625'
 
 # directories
 data_dir: './data/'
@@ -9,7 +8,6 @@ valid_path: './data/valid.csv'
 out_dir: './results/'
 
 # logging
-log_dir: './results/logging'
 verbosity: 2
 
 # data parameters
@@ -18,7 +16,6 @@ max_len: 50
 # trainer
 trainer: {
   epochs: 20,
-  save_dir: "saved/",
   save_period: 1,
   verbosity: 2,
   monitor: "min val_loss",
@@ -28,6 +25,6 @@ trainer: {
 
 # model parameters
 batch_size: 16
-learning_rate: 0.001
+learning_rate: 0.1
 
 n_gpu: 1

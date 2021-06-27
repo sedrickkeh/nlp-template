@@ -2,7 +2,7 @@ import time
 import numpy as np
 import torch
 
-from base import BaseTrainer
+from .trainer_base import BaseTrainer
 from utils import AverageMeter
 
 
@@ -36,7 +36,6 @@ class Trainer(BaseTrainer):
         acc_metrics = np.zeros(len(self.metrics))
         for i, metric in enumerate(self.metrics):
             acc_metrics[i] += metric(output, target)
-            self.writer.add_scalar("{}".format(metric.__name__), acc_metrics[i])
         return acc_metrics
 
     def _train_epoch(self, epoch):
@@ -80,9 +79,6 @@ class Trainer(BaseTrainer):
             loss.backward()
             self.optimizer.step()
 
-            self.writer.set_step((epoch - 1) * len(self.data_loader) + batch_idx)
-            self.writer.add_scalar("loss", loss.item())
-            self.writer.add_scalar("loss", loss.item())
             total_loss += loss.item()
             total_metrics += self._eval_metrics(output, target)
 
@@ -143,18 +139,15 @@ class Trainer(BaseTrainer):
                 segment_ids = segment_ids.to(self.device)
 
                 output = self.model(batch=(input_ids, attention_mask, segment_ids))
+                print(output.shape)
+                print(output)
+                print(target.shape)
+                print(target)
                 loss = self.loss(output, target)
 
-                self.writer.set_step(
-                    (epoch - 1) * len(self.valid_data_loader) + batch_idx, "valid"
-                )
-                self.writer.add_scalar("loss", loss.item())
+                print(loss.item())
                 total_val_loss += loss.item()
                 total_val_metrics += self._eval_metrics(output, target)
-                
-        # add histogram of model parameters to the tensorboard
-        for name, p in self.model.named_parameters():
-            self.writer.add_histogram(name, p, bins="auto")
 
         return {
             "val_loss": total_val_loss / len(self.valid_data_loader),

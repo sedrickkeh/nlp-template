@@ -20,7 +20,7 @@
         "class": "logging.handlers.RotatingFileHandler",
         "level": "INFO",
         "formatter": "datetime",
-        "filename": "info.log",
+        "filename": "experiment.log",
         "maxBytes": 10485760,
         "backupCount": 20,
         "encoding": "utf8"

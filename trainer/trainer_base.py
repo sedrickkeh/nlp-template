@@ -7,7 +7,7 @@ from abc import abstractmethod
 import torch
 from numpy import inf
 
-from logger import WriterTensorboardX, get_logger
+from .logger import get_logger
 
 
 class BaseTrainer:
@@ -17,7 +17,7 @@ class BaseTrainer:
 
     def __init__(self, model, loss, metrics, optimizer, config):
         self.config = config
-        self.logger = get_logger("trainer", config.verbosity)
+        self.logger = get_logger(config.out_dir, "trainer", config.verbosity)
 
         # setup GPU device if available, move model into configured device
         self.device, device_ids = self._prepare_device(config["n_gpu"])
@@ -48,10 +48,6 @@ class BaseTrainer:
         self.start_epoch = 1
 
         self.checkpoint_dir = config.out_dir
-        # setup visualization writer instance
-        self.writer = WriterTensorboardX(
-            config.log_dir, self.logger, cfg_trainer["tensorboardX"]
-        )
 
         # if config.resume is not None:
         #     self._resume_checkpoint(config.resume)
@@ -196,8 +192,7 @@ class BaseTrainer:
             )
         self.model.load_state_dict(checkpoint["state_dict"])
 
-        # load optimizer state from checkpoint only when optimizer type is not
-        # changed.
+        # load optimizer state from checkpoint only when optimizer type is not changed.
         if (
             checkpoint["config"]["optimizer"]["type"]
             != self.config["optimizer"]["type"]
