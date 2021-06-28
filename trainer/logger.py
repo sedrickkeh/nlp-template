@@ -6,7 +6,10 @@ from utils import read_json
 
 
 def setup_logging(
-    log_dir, log_config="trainer/logger_config.json", default_level=logging.INFO
+    log_dir,
+    log_config="trainer/logger_config.json",
+    default_level=logging.INFO,
+    is_train=True,
 ):
     """
     Setup logging configuration
@@ -17,7 +20,10 @@ def setup_logging(
         # modify logging paths based on run config
         for _, handler in config["handlers"].items():
             if "filename" in handler:
-                handler["filename"] = "{}/{}".format(log_dir, handler["filename"])
+                if is_train:
+                    handler["filename"] = "{}/{}".format(log_dir, handler["filename"])
+                else:
+                    handler["filename"] = "{}/{}".format(log_dir, "testing.log")
         logging.config.dictConfig(config)
 
     else:
@@ -27,7 +33,7 @@ def setup_logging(
         logging.basicConfig(level=default_level)
 
 
-def get_logger(log_dir, name, verbosity=1):
+def get_logger(log_dir, name, verbosity=1, is_train=True):
     log_levels = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
     msg_verbosity = "verbosity option {} is invalid. Valid options are {}.".format(
         verbosity, log_levels.keys()
@@ -36,5 +42,5 @@ def get_logger(log_dir, name, verbosity=1):
     logger = logging.getLogger(name)
     logger.setLevel(log_levels[verbosity])
 
-    setup_logging(log_dir)
+    setup_logging(log_dir, is_train=is_train)
     return logger

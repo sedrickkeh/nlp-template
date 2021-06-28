@@ -43,3 +43,37 @@ def get_dataloaders(config, tokenizer):
     validloader = DataLoader(valid, batch_size=config.batch_size)
 
     return trainloader, validloader
+
+
+def load_testdata(config):
+    data_paths = {"test": config.test_path}
+    datasets = load_dataset("csv", data_files=data_paths)
+    test = datasets["test"]
+    return test
+
+
+def get_testloader(config, tokenizer):
+    test = load_testdata(config)
+
+    # Tokenize
+    test = test.map(
+        lambda x: tokenizer(
+            x["text"], truncation=True, padding="max_length", max_length=config.max_len
+        ),
+        batched=True,
+    )
+
+    # Set the format for __getitem__ which returns input_ids, token_type_ids , attention_mask and label
+    if config.has_targets:
+        test.set_format(
+            type="torch",
+            columns=["input_ids", "token_type_ids", "attention_mask", "target"],
+        )
+    else:
+        test.set_format(
+            type="torch",
+            columns=["input_ids", "token_type_ids", "attention_mask"],
+        )
+
+    testloader = DataLoader(test, batch_size=config.batch_size)
+    return testloader

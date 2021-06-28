@@ -18,7 +18,9 @@ class BaseTrainer:
 
     def __init__(self, model, loss, metrics, optimizer, config):
         self.config = config
-        self.logger = get_logger(config.out_dir, "trainer", config.verbosity)
+        self.logger = get_logger(
+            config.out_dir, "trainer", config.verbosity, is_train=True
+        )
         self.logger.info("configs: {}".format(config))
 
         # setup GPU device if available, move model into configured device
@@ -33,8 +35,7 @@ class BaseTrainer:
 
         self.epochs = config.epochs
         self.save_period = config.save_period
-        # self.monitor = config.monitor
-        self.monitor = config.monitor = "off"
+        self.monitor = config.monitor
 
         # configuration to monitor model performance and save best
         if self.monitor == "off":

@@ -55,7 +55,9 @@ def main(config):
 if __name__ == "__main__":
     # Parameters
     parser = configargparse.ArgumentParser(description="Arguments for experiment")
-    parser.add_argument("--config_path", is_config_file=True, help="Experiment config")
+    parser.add_argument(
+        "--config_path", is_config_file=True, default="configs/config-train.yaml"
+    )
     data_args(parser)  # data configs
     model_args(parser)  # model configs
     train_args(parser)  # training, logging configs

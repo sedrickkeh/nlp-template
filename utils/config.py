@@ -24,3 +24,18 @@ def train_args(parser):
 
     # logging
     parser.add_argument("--verbosity", type=int, default=2)
+
+
+def test_args(parser):
+    parser.add_argument("--data_dir", type=str)
+    parser.add_argument("--test_path", type=str)
+    parser.add_argument("--has_targets", action="store_true")
+
+    # logging
+    parser.add_argument("--verbosity", type=int, default=2)
+
+    # model
+    parser.add_argument("--max_len", type=int, default=50)
+    parser.add_argument("--batch_size", type=int, default=16)
+
+    parser.add_argument("--n_gpu", type=int, default=1)

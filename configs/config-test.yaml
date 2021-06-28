@@ -1,0 +1,15 @@
+# directories
+data_dir: ./data/
+test_path: ./data/test.csv
+
+# logging
+verbosity: 2
+
+# data parameters
+max_len: 50
+
+# model parameters
+batch_size: 16
+
+n_gpu: 1
+has_targets: False
