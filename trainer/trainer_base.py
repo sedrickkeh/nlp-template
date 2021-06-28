@@ -31,8 +31,8 @@ class BaseTrainer:
         self.metrics = metrics
         self.optimizer = optimizer
 
-        self.epochs = config.epochs 
-        self.save_period = config.save_period 
+        self.epochs = config.epochs
+        self.save_period = config.save_period
         # self.monitor = config.monitor
         self.monitor = config.monitor = "off"
 
@@ -214,5 +214,5 @@ class BaseTrainer:
 
     def _save_configs(self, config, config_save_path):
         config_save_path = "{}/{}".format(config_save_path, "config.yaml")
-        with open(config_save_path, 'w') as outfile:
+        with open(config_save_path, "w") as outfile:
             yaml.dump(vars(config), outfile, default_flow_style=False)

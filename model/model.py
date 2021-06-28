@@ -8,7 +8,9 @@ class BertClassifier(nn.Module):
     def __init__(self, out_dim):
         super(BertClassifier, self).__init__()
         self.out_dim = out_dim
-        self.model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=self.out_dim)
+        self.model = BertForSequenceClassification.from_pretrained(
+            "bert-base-uncased", num_labels=self.out_dim
+        )
 
         for param in self.model.parameters():
             param.requires_grad = True
@@ -29,7 +31,7 @@ class BertClassifier(nn.Module):
 
     def get_bert_features(self, batch):
         input_ids, attention_mask, segment_ids = batch
-        
+
         features = self.model.bert(input_ids, segment_ids, attention_mask)
 
         return features

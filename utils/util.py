@@ -2,9 +2,11 @@ import json
 from datetime import datetime
 from collections import OrderedDict
 
+
 def read_json(fname):
     with fname.open("rt") as handle:
         return json.load(handle, object_hook=OrderedDict)
+
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -23,6 +25,7 @@ class AverageMeter(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
+
 
 class Timer:
     def __init__(self):

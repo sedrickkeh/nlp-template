@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from sklearn.metrics import accuracy_score
 
+
 def accuracy(outputs, labels):
     """
     Compute the accuracy, given the outputs and labels for all tokens. Exclude PADding terms.
@@ -19,6 +20,7 @@ def accuracy(outputs, labels):
     correct = (predicted == labels).sum()
     accuracy = float(correct) / total
     return accuracy
+
 
 def bce_loss(outputs, labels):
 

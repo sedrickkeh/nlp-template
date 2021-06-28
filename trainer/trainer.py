@@ -83,7 +83,7 @@ class Trainer(BaseTrainer):
 
                 losses.update(loss.item(), target.size(0))
                 pbar.set_postfix(loss="{:.3f}({:.3f})".format(losses.val, losses.avg))
-        
+
         log = {
             "loss": total_loss / len(self.data_loader),
             "metrics": (total_metrics / len(self.data_loader)).tolist(),
@@ -96,7 +96,9 @@ class Trainer(BaseTrainer):
         if self.lr_scheduler is not None:
             self.lr_scheduler.step()
 
-        self.logger.info("Epoch {} time taken: {}".format(epoch, time.time() - start_time))
+        self.logger.info(
+            "Epoch {} time taken: {}".format(epoch, time.time() - start_time)
+        )
         return log
 
     def _valid_epoch(self, epoch):

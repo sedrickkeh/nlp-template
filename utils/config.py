@@ -1,7 +1,8 @@
-import configargparse 
+import configargparse
+
 
 def data_args(parser):
-    parser.add_argument("--data_dir", type=str,)
+    parser.add_argument("--data_dir", type=str)
     parser.add_argument("--train_path", type=str)
     parser.add_argument("--valid_path", type=str)
     parser.add_argument("--out_dir", type=str)

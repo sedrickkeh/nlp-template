@@ -19,7 +19,7 @@ def setup_logging(
             if "filename" in handler:
                 handler["filename"] = "{}/{}".format(log_dir, handler["filename"])
         logging.config.dictConfig(config)
-        
+
     else:
         print(
             "Warning: logging configuration file is not found in {}.".format(log_config)

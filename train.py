@@ -1,6 +1,6 @@
 import os
 import configargparse
-from datetime import datetime 
+from datetime import datetime
 
 import torch
 from transformers import AutoTokenizer, AdamW
@@ -16,10 +16,10 @@ from trainer.trainer import Trainer
 def main(config):
 
     # Initialize tokenizer
-    tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
+    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
     # Load data
-    trainloader, validloader = get_dataloaders(config, tokenizer)  
+    trainloader, validloader = get_dataloaders(config, tokenizer)
 
     # Experiment tracking and saving
     version = datetime.now().strftime("%Y-%m-%d-%H:%M")
@@ -38,25 +38,27 @@ def main(config):
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=300)
 
     # Load trainer
-    trainer = Trainer(model, 
-                      loss, 
-                      metrics, 
-                      optim, 
-                      config,
-                      trainloader,
-                      validloader,
-                      scheduler)
+    trainer = Trainer(
+        model,
+        loss,
+        metrics,
+        optim,
+        config,
+        trainloader,
+        validloader,
+        scheduler,
+    )
 
     trainer.train()
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     # Parameters
-    parser = configargparse.ArgumentParser(description='Arguments for experiment')
+    parser = configargparse.ArgumentParser(description="Arguments for experiment")
     parser.add_argument("--config_path", is_config_file=True, help="Experiment config")
-    data_args(parser)       # data configs
-    model_args(parser)      # model configs    
-    train_args(parser)      # training, logging configs
+    data_args(parser)  # data configs
+    model_args(parser)  # model configs
+    train_args(parser)  # training, logging configs
     args = parser.parse_args()
 
     # Experiment Tracking

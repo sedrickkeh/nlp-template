@@ -5,4 +5,3 @@ This is a template for NLP projects in PyTorch. The sample task used is [Disaste
 TODO:
 - add testing
 - wandb integration
-- linting/formatting
