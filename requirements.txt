@@ -1,4 +1,4 @@
-easydict==1.9
+configargparse==1.5
 torch==1.7.0
 transformers==3.5.1
 pyyaml==5.4.1

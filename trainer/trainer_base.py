@@ -3,6 +3,7 @@ Reference: https://github.com/ahmetgunduz/pytorch-nlp-project-template
 """
 
 from abc import abstractmethod
+import yaml
 
 import torch
 from numpy import inf
@@ -18,9 +19,10 @@ class BaseTrainer:
     def __init__(self, model, loss, metrics, optimizer, config):
         self.config = config
         self.logger = get_logger(config.out_dir, "trainer", config.verbosity)
+        self.logger.info("configs: {}".format(config))
 
         # setup GPU device if available, move model into configured device
-        self.device, device_ids = self._prepare_device(config["n_gpu"])
+        self.device, device_ids = self._prepare_device(config.n_gpu)
         self.model = model.to(self.device)
         if len(device_ids) > 1:
             self.model = torch.nn.DataParallel(model, device_ids=device_ids)
@@ -29,10 +31,10 @@ class BaseTrainer:
         self.metrics = metrics
         self.optimizer = optimizer
 
-        cfg_trainer = config["trainer"]
-        self.epochs = cfg_trainer["epochs"]
-        self.save_period = cfg_trainer["save_period"]
-        self.monitor = cfg_trainer.get("monitor", "off")
+        self.epochs = config.epochs 
+        self.save_period = config.save_period 
+        # self.monitor = config.monitor
+        self.monitor = config.monitor = "off"
 
         # configuration to monitor model performance and save best
         if self.monitor == "off":
@@ -43,11 +45,13 @@ class BaseTrainer:
             assert self.mnt_mode in ["min", "max"]
 
             self.mnt_best = inf if self.mnt_mode == "min" else -inf
-            self.early_stop = cfg_trainer.get("early_stop", inf)
+            # self.early_stop = config.early_stop
+            self.early_stop = inf
 
         self.start_epoch = 1
 
         self.checkpoint_dir = config.out_dir
+        self._save_configs(config, config.out_dir)
 
         # if config.resume is not None:
         #     self._resume_checkpoint(config.resume)
@@ -207,3 +211,8 @@ class BaseTrainer:
         self.logger.info(
             "Checkpoint loaded. Resume training from epoch {}".format(self.start_epoch)
         )
+
+    def _save_configs(self, config, config_save_path):
+        config_save_path = "{}/{}".format(config_save_path, "config.yaml")
+        with open(config_save_path, 'w') as outfile:
+            yaml.dump(vars(config), outfile, default_flow_style=False)

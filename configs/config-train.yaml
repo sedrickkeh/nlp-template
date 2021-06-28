@@ -1,8 +1,9 @@
 # directories
-data_dir: './data/'
-train_path: './data/train.csv'
-valid_path: './data/valid.csv'
-out_dir: './results/'
+data_dir: ./data/
+train_path: ./data/train.csv
+valid_path: ./data/valid.csv
+out_dir: ./results/
+out_dir_root: ./results/
 
 # logging
 verbosity: 2
@@ -11,12 +12,10 @@ verbosity: 2
 max_len: 50
 
 # trainer
-trainer: {
-  epochs: 20,
-  save_period: 1,
-  monitor: "min val_loss",
-  early_stop: 10
-}
+epochs: 20
+save_period: 1
+monitor: min val_loss
+early_stop: 10
 
 # model parameters
 batch_size: 16
