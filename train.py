@@ -3,7 +3,7 @@ import configargparse
 from datetime import datetime
 
 import torch
-from transformers import AutoTokenizer, AdamW
+from transformers import AutoTokenizer, AdamW, get_linear_schedule_with_warmup
 
 from utils.config import *
 from dataloaders.get_dataloaders import get_dataloaders
@@ -34,15 +34,19 @@ def main(config):
     # Loss, metrics, optimizer, scheduler
     loss = cross_entropy
     metrics = [accuracy]
-    optim = AdamW(model.parameters(), lr=config.learning_rate)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=300)
+    optimizer = AdamW(model.parameters(), lr=config.learning_rate)
+    scheduler = get_linear_schedule_with_warmup(
+        optimizer,
+        num_warmup_steps=config.warmup_steps,
+        num_training_steps=len(trainloader) * config.epochs,
+    )
 
     # Load trainer
     trainer = Trainer(
         model,
         loss,
         metrics,
-        optim,
+        optimizer,
         config,
         trainloader,
         validloader,
@@ -65,6 +69,6 @@ if __name__ == "__main__":
 
     # Experiment Tracking
     # wandb.init()
-    # wandb.config.update(config)
+    # wandb.config.update(args)
 
     main(args)

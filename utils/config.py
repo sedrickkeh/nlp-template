@@ -20,6 +20,7 @@ def train_args(parser):
     parser.add_argument("--early_stop", type=int)
     parser.add_argument("--batch_size", type=int, default=16)
     parser.add_argument("--learning_rate", type=float, default=0.00005)
+    parser.add_argument("--warmup_steps", type=int, default=2000)
     parser.add_argument("--n_gpu", type=int, default=1)
 
     # logging

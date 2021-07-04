@@ -15,6 +15,7 @@ max_len: 50
 epochs: 20
 save_period: 1
 monitor: min val_loss
+warmup_steps: 2000
 early_stop: 10
 
 # model parameters
