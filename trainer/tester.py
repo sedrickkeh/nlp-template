@@ -14,10 +14,10 @@ class Tester:
         self.logger.info("configs: {}".format(config))
 
         # setup GPU device if available, move model into configured device
-        self.device, device_ids = self._prepare_device(config.n_gpu)
+        self.device, self.device_ids = self._prepare_device(config.n_gpu)
         self.model = model.to(self.device)
-        if len(device_ids) > 1:
-            self.model = torch.nn.DataParallel(model, device_ids=device_ids)
+        if len(self.device_ids) > 1:
+            self.model = torch.nn.DataParallel(model, device_ids=self.device_ids)
 
         # load model from checkpoint
         model_path = "{}/{}".format(config.out_dir, "model_best.pth")

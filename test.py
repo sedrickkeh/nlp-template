@@ -17,7 +17,6 @@ def main(config):
     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
     # Load data
-
     testloader = get_testloader(config, tokenizer)
 
     # load model
